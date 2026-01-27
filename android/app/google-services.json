@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "1001244906217",
+    "project_id": "yapper-chat-application",
+    "storage_bucket": "yapper-chat-application.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1001244906217:android:d13dc53dfa88e919539678",
+        "android_client_info": {
+          "package_name": "com.example.yapper"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1001244906217-r4jktu5vg14fo081fhqma297lhtvfhnm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGBQlNJT3hLaYAjpZBv7B9SrBV1vzPlow"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1001244906217-r4jktu5vg14fo081fhqma297lhtvfhnm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1001244906217-p4ug395555a8fjco01iflre5djt8flom.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.yapper"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
