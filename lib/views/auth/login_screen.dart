@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:yapper/controllers/auth_controller.dart';
-import 'package:yapper/theme/app_theme.dart';
-
+import 'dart:math' as math;
+import '../../controllers/auth_controller.dart';
+import '../../theme/app_theme.dart';
 import '../../routes/app_routes.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -12,192 +12,380 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final _forceKey = GlobalKey<FormState>();
+class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin {
+  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final AuthController _authController = Get.find<AuthController>();
-  bool _obsecurePassword = true;
+  
+  late AnimationController _rotationController;
+  bool _obscurePassword = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _rotationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 25),
+    )..repeat();
+  }
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _rotationController.dispose();
     super.dispose();
+  }
+
+  void _handleLogin() {
+    if (_formKey.currentState?.validate() ?? false) {
+      _authController.signInWithEmailAndPassword(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(24),
-          child: Form(
-            key: _forceKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 80),
-                Center(
-                  child: Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryColor,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Icon(
-                      Icons.chat_bubble_rounded,
-                      color: Colors.white,
-                      size: 48,
-                    ),
-                  ),
+      backgroundColor: const Color(0xFF08080A), // Deep obsidian
+      body: Stack(
+        children: [
+          // Background Mesh Effect (Originating from bottom-left for visual variety)
+          AnimatedBuilder(
+            animation: _rotationController,
+            builder: (context, child) {
+              return CustomPaint(
+                painter: LoginMeshPainter(
+                  rotation: _rotationController.value,
                 ),
-                SizedBox(height: 32),
-                Text(
-                  "Welcome Back!",
-                  style: Theme.of(context).textTheme.headlineLarge,
-                ),
-                SizedBox(height: 8),
-                Text(
-                  "Sign in to continue chatting with your friends.",
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(color: AppTheme.textMed),
-                ),
-                SizedBox(height: 40),
-                TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    labelText: "Email",
-                    prefixIcon: Icon(Icons.email_rounded),
-                  ),
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) {
-                      return 'Please enter your email';
-                    }
-                    if (!GetUtils.isEmail(value!)) {
-                      return 'Please enter a valid email';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 16),
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: _obsecurePassword,
-                  decoration: InputDecoration(
-                    labelText: "Password",
-                    prefixIcon: Icon(Icons.lock_rounded),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obsecurePassword
-                            ? Icons.visibility_off_rounded
-                            : Icons.visibility_rounded,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obsecurePassword = !_obsecurePassword;
-                        });
-                      },
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) {
-                      return 'Please enter your password';
-                    }
-                    if (value!.length < 6) {
-                      return 'Password must be at least 6 characters';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 24),
-                Obx(
-                  () => SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _authController.isLoading ? null : (){
-                        if (_forceKey.currentState?.validate() ?? false) {
-                          _authController.signInWithEmailAndPassword(
-                            _emailController.text.trim(),
-                            _passwordController.text.trim(),
-                          );
-                        }
-                      },
-                      child: _authController.isLoading
-                          ? SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : Text("Login"),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 16),
-                Center(
-                  child: TextButton(
-                    onPressed: () {
-                      Get.toNamed(AppRoutes.forgotPassword);
-                    },
-                    child: Text(
-                      "Forgot Password?",
-                      style: TextStyle(
-                        color: AppTheme.primaryColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 32),
-                Row(
+                size: Size.infinite,
+              );
+            },
+          ),
+          
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(child: Divider(color: AppTheme.borderColor)),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
-                      child: Text(
-                        "OR",
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ),
-
-                  ],
-                ),
-                SizedBox(height: 32),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Don't have an account?",
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyMedium
-                          ?.copyWith(color: AppTheme.textMed),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Get.toNamed(AppRoutes.register);
-                      },
-                      child: Text(
-                        "Sign Up",
-                        style: TextStyle(
-                          color: AppTheme.primaryColor,
-                          fontWeight: FontWeight.bold,
+                    const SizedBox(height: 60),
+                    
+                    // Technical Header Icon
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: const Color(0xFF22D3EE).withOpacity(0.2),
+                            width: 1,
+                          ),
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              const Color(0xFF6366F1).withOpacity(0.1),
+                              const Color(0xFFA855F7).withOpacity(0.1),
+                            ],
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.fingerprint_rounded,
+                          color: Color(0xFF22D3EE),
+                          size: 48,
                         ),
                       ),
                     ),
+                    
+                    const SizedBox(height: 48),
+                    
+                    // Typography
+                    Text(
+                      "AUTHENTICATION REQUIRED",
+                      style: TextStyle(
+                        color: const Color(0xFF22D3EE).withOpacity(0.8),
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 4,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      "ACCESS CORE",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 32,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 2,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      "Provide your credentials to establish a secure link.",
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.5),
+                        fontSize: 14,
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 48),
+                    
+                    // Input Fields
+                    _buildTechnicalField(
+                      controller: _emailController,
+                      label: "NODE IDENTITY (EMAIL)",
+                      hint: "node@mesh.network",
+                      icon: Icons.alternate_email_rounded,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) return 'REQUIRED';
+                        if (!GetUtils.isEmail(value)) return 'INVALID FORMAT';
+                        return null;
+                      },
+                    ),
+                    
+                    const SizedBox(height: 24),
+                    
+                    _buildTechnicalField(
+                      controller: _passwordController,
+                      label: "ACCESS KEY (PASSWORD)",
+                      hint: "••••••••",
+                      icon: Icons.vpn_key_outlined,
+                      isPassword: true,
+                      obscureText: _obscurePassword,
+                      onToggleVisibility: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                      validator: (value) => (value == null || value.isEmpty) ? 'REQUIRED' : null,
+                    ),
+                    
+                    const SizedBox(height: 12),
+                    
+                    // Forgot Password Link
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () => Get.toNamed(AppRoutes.forgotPassword),
+                        child: Text(
+                          "RECOVER KEY",
+                          style: TextStyle(
+                            color: const Color(0xFF22D3EE).withOpacity(0.7),
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 24),
+                    
+                    // Login Button
+                    Obx(
+                      () => SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: ElevatedButton(
+                          onPressed: _authController.isLoading ? null : _handleLogin,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF22D3EE),
+                            foregroundColor: const Color(0xFF08080A),
+                            disabledBackgroundColor: const Color(0xFF22D3EE).withOpacity(0.3),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: _authController.isLoading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Color(0xFF08080A),
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Text(
+                                  "ESTABLISH LINK",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 2,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 32),
+                    
+                    // Navigation to Register
+                    Center(
+                      child: GestureDetector(
+                        onTap: () => Get.toNamed(AppRoutes.register),
+                        child: RichText(
+                          text: TextSpan(
+                            text: "NEW NODE? ",
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.4),
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1,
+                            ),
+                            children: const [
+                              TextSpan(
+                                text: "INITIALIZE IDENTITY",
+                                style: TextStyle(
+                                  color: Color(0xFF22D3EE),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 48),
+                    
+                    // Footer Security Info
+                    Center(
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 1,
+                            color: const Color(0xFF22D3EE).withOpacity(0.1),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            "SYSTEM STATUS: SECURE",
+                            style: TextStyle(
+                              color: const Color(0xFF22D3EE).withOpacity(0.3),
+                              fontSize: 8,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
+
+  Widget _buildTechnicalField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    bool isPassword = false,
+    bool obscureText = false,
+    VoidCallback? onToggleVisibility,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: const Color(0xFF22D3EE).withOpacity(0.6),
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 2,
+          ),
+        ),
+        const SizedBox(height: 10),
+        TextFormField(
+          controller: controller,
+          obscureText: obscureText,
+          keyboardType: keyboardType,
+          validator: validator,
+          style: const TextStyle(color: Colors.white, fontSize: 16),
+          cursorColor: const Color(0xFF22D3EE),
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: TextStyle(color: Colors.white.withOpacity(0.15)),
+            prefixIcon: Icon(icon, color: Colors.white.withOpacity(0.3), size: 20),
+            suffixIcon: isPassword
+                ? IconButton(
+                    icon: Icon(
+                      obscureText ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                      color: Colors.white.withOpacity(0.3),
+                      size: 20,
+                    ),
+                    onPressed: onToggleVisibility,
+                  )
+                : null,
+            filled: true,
+            fillColor: Colors.white.withOpacity(0.02),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(4),
+              borderSide: BorderSide(color: Colors.white.withOpacity(0.05)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(4),
+              borderSide: const BorderSide(color: Color(0xFF22D3EE), width: 1),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(4),
+              borderSide: BorderSide(color: Colors.redAccent.withOpacity(0.5)),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(4),
+              borderSide: const BorderSide(color: Colors.redAccent),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class LoginMeshPainter extends CustomPainter {
+  final double rotation;
+
+  LoginMeshPainter({required this.rotation});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFFA855F7).withOpacity(0.04) // Purple tint for login
+      ..strokeWidth = 0.5;
+
+    final center = Offset(0, size.height); // Bottom-left origin
+    const nodes = 10;
+    final radius = size.width * 0.7;
+
+    for (var i = 0; i < nodes; i++) {
+      final angle = (i * 2 * math.pi / nodes) - (rotation * 0.3 * math.pi);
+      final x = center.dx + radius * math.cos(angle);
+      final y = center.dy + radius * math.sin(angle);
+      
+      canvas.drawLine(Offset(x, y), center, paint);
+      
+      final nextAngle = ((i + 1) * 2 * math.pi / nodes) - (rotation * 0.3 * math.pi);
+      final nx = center.dx + radius * math.cos(nextAngle);
+      final ny = center.dy + radius * math.sin(nextAngle);
+      canvas.drawLine(Offset(x, y), Offset(nx, ny), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant LoginMeshPainter oldDelegate) => true;
 }

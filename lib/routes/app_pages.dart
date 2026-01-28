@@ -9,7 +9,7 @@ import '../views/auth/login_screen.dart';
 import '../views/auth/register_screen.dart';
 
 class AppPages {
-  static const initial = AppRoutes.splash;
+  static const initial = AppRoutes.register;
 
   static final routes = [
     GetPage(
@@ -29,11 +29,10 @@ class AppPages {
       page: () => LoginScreen(),
       
     ),
-    // GetPage(
-    //   name: AppRoutes.register,
-    //   page: () => RegisterScreen(),
-      
-    // ),
+    GetPage(
+      name: AppRoutes.register,
+      page: () => RegisterScreen(),
+    ),
     // GetPage(
     //   name: AppRoutes.forgotPassword,
     //   page: () => ForgotPasswordScreen(),

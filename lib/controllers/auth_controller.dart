@@ -11,11 +11,12 @@ class AuthController extends GetxController {
   final RxBool _isLoading = false.obs;
   final RxString _errorMessage = ''.obs;
   final RxBool _isInitialized = false.obs;
+  final RxBool _isAuthenticated = false.obs;
   User? get user => _user.value;
   UserModel? get userModel => _userModel.value;
   bool get isLoading => _isLoading.value;
   bool get isInitialized => _isInitialized.value;
-  bool get isAuthenticated => _user.value != null;
+  bool get isAuthenticated => _isAuthenticated.value;
   String get error => _errorMessage.value;
 
   @override
