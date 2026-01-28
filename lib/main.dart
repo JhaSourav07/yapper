@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: "Yapper",
-      theme: AppTheme.lightTheme,
+      theme: AppTheme.darkTheme,
       themeMode: ThemeMode.light,
       initialRoute: AppPages.initial,
       getPages: AppPages.routes,
