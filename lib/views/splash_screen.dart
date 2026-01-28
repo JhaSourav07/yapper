@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 import 'dart:ui';
 import 'dart:async';
 import 'dart:math' as math;
+
+import 'package:yapper/controllers/auth_controller.dart';
+import 'package:yapper/routes/app_routes.dart';
 
 /// A refined splash screen for Yapper featuring a dynamic "Secure Mesh" animation.
 /// Uses a combination of pulsing particles and a glassmorphic central core.
@@ -59,16 +63,24 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with TickerProvider
           });
         } else {
           timer.cancel();
-          _handleNavigation();
+          _checkAuthAndNavigate();
         }
       }
     });
+
+    _checkAuthAndNavigate();
   }
 
-  Future<void> _handleNavigation() async {
-    if (mounted) {
-      await Future.delayed(const Duration(milliseconds: 500));
-      // TODO: Navigator.pushReplacementNamed(context, '/login');
+  void _checkAuthAndNavigate() async {
+    // Simulate checking authentication status
+    await Future.delayed(const Duration(seconds: 4));
+    final authController = Get.put(AuthController(), permanent: true);
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    if (authController.isAuthenticated) {
+      Get.offAllNamed(AppRoutes.main);
+    } else {
+      Get.offAllNamed(AppRoutes.login);
     }
   }
 

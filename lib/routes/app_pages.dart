@@ -3,7 +3,10 @@ import 'package:get/get.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:get/utils.dart';
 import 'package:yapper/routes/app_routes.dart';
-import 'package:yapper/views/auth/splash_screen.dart';
+import 'package:yapper/views/splash_screen.dart';
+
+import '../views/auth/login_screen.dart';
+import '../views/auth/register_screen.dart';
 
 class AppPages {
   static const initial = AppRoutes.splash;
@@ -21,15 +24,15 @@ class AppPages {
     //     Get.put(HomeController());
     //   }),
     // ),
-    // GetPage(
-    //   name: AppRoutes.login,
-    //   page: () => LoginScreen(),
-    //   
-    // ),
+    GetPage(
+      name: AppRoutes.login,
+      page: () => LoginScreen(),
+      
+    ),
     // GetPage(
     //   name: AppRoutes.register,
     //   page: () => RegisterScreen(),
-    //   
+      
     // ),
     // GetPage(
     //   name: AppRoutes.forgotPassword,
