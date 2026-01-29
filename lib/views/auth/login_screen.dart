@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:math' as math;
 import '../../controllers/auth_controller.dart';
-import '../../theme/app_theme.dart';
 import '../../routes/app_routes.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -38,12 +37,31 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     super.dispose();
   }
 
-  void _handleLogin() {
+  /// Handles the authentication protocol asynchronously
+  Future<void> _handleLogin() async {
     if (_formKey.currentState?.validate() ?? false) {
-      _authController.signInWithEmailAndPassword(
+      // Execute sign-in and wait for the result
+      await _authController.signInWithEmailAndPassword(
         _emailController.text.trim(),
         _passwordController.text.trim(),
       );
+      
+      // Explicitly check for successful authentication to trigger navigation
+      // This prevents the UI from getting stuck if the controller doesn't 
+      // handle global navigation internally.
+      if (_authController.isAuthenticated) {
+        Get.offAllNamed(AppRoutes.main);
+      }
+      else {
+        // Optionally, show an error message if authentication fails
+        // Get.snackbar(
+        //   "AUTHENTICATION FAILED",
+        //   _authController.error.isNotEmpty ? _authController.error : "PLEASE CHECK CREDENTIALS",
+        //   backgroundColor: AppTheme.bgDark,
+        //   colorText: Colors.white,
+        //   snackPosition: SnackPosition.BOTTOM,
+        // );
+      }
     }
   }
 

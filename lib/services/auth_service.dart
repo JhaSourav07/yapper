@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:yapper/services/firestore_service.dart';
-
 import '../models/user_model.dart';
 
 
@@ -88,7 +87,7 @@ class AuthService {
   
 
     }
-    Future<void> sendPasswordResetEmail({required String email}) async {
+    Future<void> sendPasswordResetEmail(String trim, {required String email}) async {
       try {
         await _auth.sendPasswordResetEmail(email: email);
       } on FirebaseAuthException catch (e) {

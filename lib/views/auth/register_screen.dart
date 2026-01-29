@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:math' as math;
 import '../../controllers/auth_controller.dart';
-import '../../theme/app_theme.dart';
 import '../../routes/app_routes.dart';
 
 class RegisterScreen extends StatefulWidget {

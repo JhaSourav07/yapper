@@ -1,15 +1,13 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
-import 'package:get/utils.dart';
 import 'package:yapper/routes/app_routes.dart';
 import 'package:yapper/views/splash_screen.dart';
-
+import '../views/auth/forgot_password_screen.dart';
 import '../views/auth/login_screen.dart';
 import '../views/auth/register_screen.dart';
 
 class AppPages {
-  static const initial = AppRoutes.register;
+  static const initial = AppRoutes.splash;
 
   static final routes = [
     GetPage(
@@ -33,13 +31,13 @@ class AppPages {
       name: AppRoutes.register,
       page: () => RegisterScreen(),
     ),
-    // GetPage(
-    //   name: AppRoutes.forgotPassword,
-    //   page: () => ForgotPasswordScreen(),
-    //   binding: BindingBuilder(() {
-    //     Get.put(ForgotPasswordController());
-    //   }),
-    // ),
+    GetPage(
+      name: AppRoutes.forgotPassword,
+      page: () => ForgotPasswordScreen(),
+      // binding: BindingBuilder(() {
+      //   Get.put(ForgotPasswordController());
+      // }),
+    ),
     // GetPage(
     //   name: AppRoutes.changePassword,
     //   page: () => ChangePasswordScreen(),
