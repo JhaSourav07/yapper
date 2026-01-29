@@ -2,12 +2,14 @@ import 'package:get/get.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:yapper/routes/app_routes.dart';
 import 'package:yapper/views/splash_screen.dart';
+import '../controllers/change_password_controller.dart';
 import '../controllers/profile_controller.dart';
 import '../views/auth/forgot_password_screen.dart';
 import '../views/auth/login_screen.dart';
 import '../views/auth/register_screen.dart';
 import '../views/main_screen.dart';
-import '../views/profile_screen.dart';
+import '../views/profile/change_password_screen.dart';
+import '../views/profile/profile_screen.dart';
 
 class AppPages {
   static const initial = AppRoutes.splash;
@@ -41,13 +43,13 @@ class AppPages {
       //   Get.put(ForgotPasswordController());
       // }),
     ),
-    // GetPage(
-    //   name: AppRoutes.changePassword,
-    //   page: () => ChangePasswordScreen(),
-    //   binding: BindingBuilder(() {
-    //     Get.put(ChangePasswordController());
-    //   }),
-    // ),
+    GetPage(
+      name: AppRoutes.changePassword,
+      page: () => ChangePasswordScreen(),
+      // binding: BindingsBuilder(() {
+      //   Get.put(ChangePasswordController());
+      // }),
+    ),
     GetPage(
       name: AppRoutes.profile,
       page: () => ProfileScreen(),

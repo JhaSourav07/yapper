@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:math' as math;
-import '../controllers/profile_controller.dart';
-import '../theme/app_theme.dart';
-import '../routes/app_routes.dart';
+import '../../controllers/profile_controller.dart';
+import '../../routes/app_routes.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
