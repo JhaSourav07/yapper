@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:ui';
 import 'dart:async';
 import 'dart:math' as math;
@@ -63,22 +64,24 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with TickerProvider
           });
         } else {
           timer.cancel();
+          // The sequence is finished, navigate based on auth
           _checkAuthAndNavigate();
         }
       }
     });
-
-    _checkAuthAndNavigate();
   }
 
   void _checkAuthAndNavigate() async {
-    // Simulate checking authentication status
-    await Future.delayed(const Duration(seconds: 4));
+    // Ensure AuthController is initialized
     final authController = Get.put(AuthController(), permanent: true);
-    await Future.delayed(const Duration(milliseconds: 500));
+    
+    // We check FirebaseAuth.instance.currentUser directly for the splash check.
+    // authController.isAuthenticated (Stream-based) might still be null for a few ms
+    // after initialization. currentUser is the standard synchronous way to check local session.
+    final bool hasLocalSession = FirebaseAuth.instance.currentUser != null;
 
-    if (authController.isAuthenticated) {
-      Get.offAllNamed(AppRoutes.main);
+    if (hasLocalSession) {
+      Get.offAllNamed(AppRoutes.profile);
     } else {
       Get.offAllNamed(AppRoutes.login);
     }
