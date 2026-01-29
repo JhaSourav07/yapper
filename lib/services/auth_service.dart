@@ -1,8 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-
-import 'package:firebase_core/firebase_core.dart';
-
-import 'package:flutter/material.dart';
 import 'package:yapper/services/firestore_service.dart';
 
 import '../models/user_model.dart';
