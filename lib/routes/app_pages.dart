@@ -46,9 +46,9 @@ class AppPages {
     GetPage(
       name: AppRoutes.changePassword,
       page: () => ChangePasswordScreen(),
-      // binding: BindingsBuilder(() {
-      //   Get.put(ChangePasswordController());
-      // }),
+      binding: BindingsBuilder(() {
+        Get.put(ChangePasswordController());
+      }),
     ),
     GetPage(
       name: AppRoutes.profile,
