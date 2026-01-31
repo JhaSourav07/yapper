@@ -44,8 +44,14 @@ class ProfileController extends GetxController {
 
       ever(_userModel, (UserModel? user) {
         if (user != null) {
-          displayNameController.text = user.name;
-          emailController.text = user.email;
+          // SAFETY CHECK: Only update text if it's actually different.
+          // This prevents unnecessary rebuild cycles.
+          if (displayNameController.text != user.name) {
+            displayNameController.text = user.name;
+          }
+          if (emailController.text != user.email) {
+            emailController.text = user.email;
+          }
         }
       });
     }

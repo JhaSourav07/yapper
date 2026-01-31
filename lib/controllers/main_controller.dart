@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:yapper/controllers/profile_controller.dart';
+import 'package:yapper/controllers/users_list_controller.dart';
 
 class MainController extends GetxController {
   final RxInt _currentIndex = 0.obs;
@@ -9,11 +10,11 @@ class MainController extends GetxController {
   int get currentIndex => _currentIndex.value;
 
   @override
-  void onInt() {
+  void onInit() {
     super.onInit();
     // Get.lazyPut(() => FriendsController());
     // Get.lazyPut(() => HomeController());
-    // Get.lazyPut(() => UsersListController());
+    Get.lazyPut(() => UsersListController());
     Get.lazyPut(() => ProfileController());
   }
 

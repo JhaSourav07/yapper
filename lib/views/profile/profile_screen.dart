@@ -12,7 +12,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateMixin {
-  final controller = Get.put(ProfileController());
+  final controller = Get.find<ProfileController>();
   late AnimationController _rotationController;
 
   @override

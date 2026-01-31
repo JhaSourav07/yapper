@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
+import 'package:yapper/controllers/auth_controller.dart';
+import 'package:yapper/controllers/users_list_controller.dart';
 import 'package:yapper/routes/app_routes.dart';
 import 'package:yapper/views/splash_screen.dart';
 import '../controllers/change_password_controller.dart';
@@ -16,11 +18,7 @@ class AppPages {
   static const initial = AppRoutes.splash;
 
   static final routes = [
-    GetPage(
-      name: AppRoutes.splash,
-      page: () => SplashScreen(),
-      
-    ),
+    GetPage(name: AppRoutes.splash, page: () => SplashScreen()),
     // GetPage(
     //   name: AppRoutes.home,
     //   page: () => HomeScreen(),
@@ -28,15 +26,8 @@ class AppPages {
     //     Get.put(HomeController());
     //   }),
     // ),
-    GetPage(
-      name: AppRoutes.login,
-      page: () => LoginScreen(),
-      
-    ),
-    GetPage(
-      name: AppRoutes.register,
-      page: () => RegisterScreen(),
-    ),
+    GetPage(name: AppRoutes.login, page: () => LoginScreen()),
+    GetPage(name: AppRoutes.register, page: () => RegisterScreen()),
     GetPage(
       name: AppRoutes.forgotPassword,
       page: () => ForgotPasswordScreen(),
@@ -54,9 +45,9 @@ class AppPages {
     GetPage(
       name: AppRoutes.profile,
       page: () => ProfileScreen(),
-      binding: BindingsBuilder(() {
-        Get.put(ProfileController());
-      }),
+      // binding: BindingsBuilder(() {
+      //   Get.put(ProfileController());
+      // }),
     ),
     // GetPage(
     //   name: AppRoutes.chat,
@@ -97,7 +88,13 @@ class AppPages {
       name: AppRoutes.main,
       page: () => MainScreen(),
       binding: BindingsBuilder(() {
+        // Register ALL main tab controllers here
         Get.put(MainController());
+        if (!Get.isRegistered<AuthController>()) {
+          Get.put(AuthController(), permanent: true);
+        }
+        // Get.lazyPut(() => ProfileController());     // <--- ADD THIS
+        // Get.lazyPut(() => UsersListController());   // <--- ADD THIS
       }),
     ),
     // GetPage(

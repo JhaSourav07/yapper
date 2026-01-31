@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:math' as math;
 import 'package:yapper/controllers/main_controller.dart';
+import 'package:yapper/views/find_people_screen.dart';
 import 'package:yapper/views/profile/profile_screen.dart';
 import '../theme/app_theme.dart';
 
@@ -16,19 +17,20 @@ class MainScreen extends GetView<MainController> {
         children: [
           // Global mesh background (subtle)
           Positioned.fill(
-            child: CustomPaint(painter: MainBackgroundMeshPainter()),
+            child: CustomPaint(
+              painter: MainBackgroundMeshPainter(),
+            ),
           ),
-
+          
           // Page Content
           PageView(
-            controller: Get.put(MainController()).pageController,
+            controller: controller.pageController,
             onPageChanged: controller.onPageChanged,
-            physics:
-                const NeverScrollableScrollPhysics(), // Controlled via BottomNav
+            physics: const NeverScrollableScrollPhysics(), // Controlled via BottomNav
             children: [
               _buildPlaceholderView("COMMUNICATIONS CORE"),
               _buildPlaceholderView("NODE MESH / FRIENDS"),
-              _buildPlaceholderView("DISCOVERY PROTOCOL"),
+              const FindPeopleScreen(),
               const ProfileScreen(),
             ],
           ),
@@ -39,46 +41,32 @@ class MainScreen extends GetView<MainController> {
   }
 
   Widget _buildTechnicalBottomNav() {
-    return Obx(
-      () => Container(
-        height: 70,
-        decoration: BoxDecoration(
-          color: const Color(0xFF08080A),
-          border: Border(
-            top: BorderSide(
-              color: const Color(0xFF22D3EE).withOpacity(0.1),
-              width: 1,
-            ),
+    return Obx(() => Container(
+      height: 70,
+      decoration: BoxDecoration(
+        color: const Color(0xFF08080A),
+        border: Border(
+          top: BorderSide(
+            color: const Color(0xFF22D3EE).withOpacity(0.1),
+            width: 1,
           ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildNavItem(
-              0,
-              Icons.chat_bubble_outline_rounded,
-              "CHATS",
-              hasBadge: true,
-            ),
-            _buildNavItem(1, Icons.people_outline_rounded, "MESH"),
-            _buildNavItem(2, Icons.radar_rounded, "DISCOVER"),
-            _buildNavItem(3, Icons.person_outline_rounded, "IDENTITY"),
-          ],
-        ),
       ),
-    );
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildNavItem(0, Icons.chat_bubble_outline_rounded, "CHATS", hasBadge: true),
+          _buildNavItem(1, Icons.people_outline_rounded, "MESH"),
+          _buildNavItem(2, Icons.radar_rounded, "DISCOVER"),
+          _buildNavItem(3, Icons.person_outline_rounded, "IDENTITY"),
+        ],
+      ),
+    ));
   }
 
-  Widget _buildNavItem(
-    int index,
-    IconData icon,
-    String label, {
-    bool hasBadge = false,
-  }) {
+  Widget _buildNavItem(int index, IconData icon, String label, {bool hasBadge = false}) {
     final isSelected = controller.currentIndex == index;
-    final color = isSelected
-        ? const Color(0xFF22D3EE)
-        : Colors.white.withOpacity(0.3);
+    final color = isSelected ? const Color(0xFF22D3EE) : Colors.white.withOpacity(0.3);
 
     return Expanded(
       child: InkWell(
@@ -103,20 +91,13 @@ class MainScreen extends GetView<MainController> {
                           BoxShadow(
                             color: const Color(0xFF22D3EE).withOpacity(0.4),
                             blurRadius: 4,
-                          ),
+                          )
                         ],
                       ),
-                      constraints: const BoxConstraints(
-                        minWidth: 14,
-                        minHeight: 14,
-                      ),
+                      constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
                       child: Text(
                         '${controller.getUnreadCount()}',
-                        style: const TextStyle(
-                          color: Color(0xFF08080A),
-                          fontSize: 8,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: const TextStyle(color: Color(0xFF08080A), fontSize: 8, fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -146,7 +127,7 @@ class MainScreen extends GetView<MainController> {
                   BoxShadow(
                     color: const Color(0xFF22D3EE).withOpacity(0.5),
                     blurRadius: 4,
-                  ),
+                  )
                 ],
               ),
             ),
@@ -161,11 +142,7 @@ class MainScreen extends GetView<MainController> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.construction_rounded,
-            color: const Color(0xFF22D3EE).withOpacity(0.2),
-            size: 40,
-          ),
+          Icon(Icons.construction_rounded, color: const Color(0xFF22D3EE).withOpacity(0.2), size: 40),
           const SizedBox(height: 16),
           Text(
             title,
