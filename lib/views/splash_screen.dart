@@ -81,7 +81,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with TickerProvider
     final bool hasLocalSession = FirebaseAuth.instance.currentUser != null;
 
     if (hasLocalSession) {
-      Get.offAllNamed(AppRoutes.profile);
+      Get.offAllNamed(AppRoutes.main);
     } else {
       Get.offAllNamed(AppRoutes.login);
     }

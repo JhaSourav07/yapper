@@ -50,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       // This prevents the UI from getting stuck if the controller doesn't 
       // handle global navigation internally.
       if (_authController.isAuthenticated) {
-        Get.offAllNamed(AppRoutes.profile);
+        Get.offAllNamed(AppRoutes.main);
       }
       else {
         // Optionally, show an error message if authentication fails

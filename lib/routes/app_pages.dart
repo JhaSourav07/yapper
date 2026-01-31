@@ -3,6 +3,7 @@ import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:yapper/routes/app_routes.dart';
 import 'package:yapper/views/splash_screen.dart';
 import '../controllers/change_password_controller.dart';
+import '../controllers/main_controller.dart';
 import '../controllers/profile_controller.dart';
 import '../views/auth/forgot_password_screen.dart';
 import '../views/auth/login_screen.dart';
@@ -95,9 +96,9 @@ class AppPages {
     GetPage(
       name: AppRoutes.main,
       page: () => MainScreen(),
-      // binding: BindingsBuilder(() {
-      //   Get.put(MainController());
-      // }),
+      binding: BindingsBuilder(() {
+        Get.put(MainController());
+      }),
     ),
     // GetPage(
     //   name: AppRoutes.profile,

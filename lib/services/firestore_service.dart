@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:yapper/models/friend_request_model.dart';
 import 'package:yapper/models/message_model.dart';
 import 'package:yapper/models/user_model.dart';
-
 import '../models/chat_model.dart';
 import '../models/friendship_model.dart';
 import '../models/notification_model.dart';

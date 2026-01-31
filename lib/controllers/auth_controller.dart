@@ -34,8 +34,8 @@ class AuthController extends GetxController {
       }
     }
     else {
-      if (Get.currentRoute != AppRoutes.profile){
-        Get.offAllNamed(AppRoutes.profile);
+      if (Get.currentRoute != AppRoutes.main){
+        Get.offAllNamed(AppRoutes.main);
       }
     }
     if(!_isInitialized.value){
