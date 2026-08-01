@@ -26,6 +26,7 @@ class UsersListController extends GetxController {
   
   // Relationship State Maps
   final RxMap<String, String> _sentRequestIds = <String, String>{}.obs; // ReceiverId -> RequestId
+  final RxMap<String, String> _receivedRequestIds = <String, String>{}.obs; // SenderId -> RequestId
   final RxList<String> _friendIds = <String>[].obs;
   
   // UI State
@@ -45,7 +46,6 @@ class UsersListController extends GetxController {
   @override
   void onClose() {
     searchController.dispose();
-    // Cancel all subscriptions to prevent memory leaks
     for (var sub in _subscriptions) {
       sub.cancel();
     }
@@ -60,8 +60,7 @@ class UsersListController extends GetxController {
       return;
     }
 
-    // 1. Listen to All Users with Error Handling
-    // We wrap the stream to handle errors and ensure isLoading updates
+    // 1. Listen to All Users
     final usersStream = _firestoreService.getAllUsersStream().handleError((e) {
       print("Error fetching users: $e");
       isLoading.value = false;
@@ -69,52 +68,56 @@ class UsersListController extends GetxController {
     
     _allUsers.bindStream(usersStream);
     
-    // 2. Listen to Sent Requests (Optimized)
+    // 2. Listen to Sent Requests
     final sentReqSub = _firestoreService.getSentFriendRequestsStream(currentUserId).listen(
       (requests) {
-        // Build map locally to prevent multiple UI rebuilds inside loop
         final newMap = <String, String>{};
         for (var req in requests) {
           if (req.status == FriendRequestStatus.pending) {
             newMap[req.receiverId] = req.id;
           }
         }
-        // Single update triggers only one rebuild
         _sentRequestIds.assignAll(newMap);
       },
       onError: (e) => print("Error in sent requests stream: $e"),
     );
     _subscriptions.add(sentReqSub);
 
-    // 3. Listen to Friends (Optimized)
+    // 3. Listen to Received Requests
+    final receivedReqSub = _firestoreService.getFriendRequestsStream(currentUserId).listen(
+      (requests) {
+        final newMap = <String, String>{};
+        for (var req in requests) {
+          if (req.status == FriendRequestStatus.pending) {
+            newMap[req.senderId] = req.id;
+          }
+        }
+        _receivedRequestIds.assignAll(newMap);
+      },
+      onError: (e) => print("Error in received requests stream: $e"),
+    );
+    _subscriptions.add(receivedReqSub);
+
+    // 4. Listen to Friends
     final friendSub = _firestoreService.getFriendStream(currentUserId).listen(
       (friendships) {
-        // Build list locally
         final newFriendIds = <String>[];
         for (var f in friendships) {
-          // Determine which ID in the friendship is the *other* person
           String otherId = f.user1Id == currentUserId ? f.user2Id : f.user1Id;
           newFriendIds.add(otherId);
         }
-        // Single update
         _friendIds.assignAll(newFriendIds);
       },
       onError: (e) => print("Error in friends stream: $e"),
     );
     _subscriptions.add(friendSub);
 
-    // 4. Update Filtered List
-    // We use 'ever' for the stream updates
     _filterWorker = ever(_allUsers, (_) => _filterUsers());
-    
-    // For search, we add a listener, but the main stream update handles the data refresh
     searchController.addListener(_filterUsers);
   }
 
   void _filterUsers() {
-    // Basic debounce check (optional, but good for heavy lists)
     if (_allUsers.isEmpty && isLoading.value) {
-       // Only stop loading if we actually received data (empty or not)
        isLoading.value = false;
     }
 
@@ -122,32 +125,70 @@ class UsersListController extends GetxController {
     final currentUserId = _authController.user?.uid;
 
     List<UserModel> temp = _allUsers.where((user) {
-      // Filter out self
       if (user.id == currentUserId) return false;
-      
-      // Filter by name or email
       final nameMatch = user.displayName.toLowerCase().contains(query);
       final emailMatch = user.email.toLowerCase().contains(query);
       return nameMatch || emailMatch;
     }).toList();
 
     filteredUsers.assignAll(temp);
-    
-    // Ensure loading is off once we have processed data
     if (isLoading.value) isLoading.value = false;
   }
 
   // --- Logic Helpers ---
 
   UserRelationStatus getRelationStatus(String targetUserId) {
+    final currentUserId = _authController.user?.uid;
+    if (targetUserId == currentUserId) {
+      return UserRelationStatus.self;
+    }
     if (_friendIds.contains(targetUserId)) {
       return UserRelationStatus.friend;
     }
     if (_sentRequestIds.containsKey(targetUserId)) {
       return UserRelationStatus.pendingSent;
     }
-    // Future expansion: check blocked list here
+    if (_receivedRequestIds.containsKey(targetUserId)) {
+      return UserRelationStatus.pendingReceived;
+    }
     return UserRelationStatus.none;
+  }
+
+  // --- Actions ---
+
+  Future<void> acceptFriendRequest(String targetUserId) async {
+    final requestId = _receivedRequestIds[targetUserId];
+    if (requestId == null) return;
+
+    try {
+      await _firestoreService.respondToFriendRequest(
+        requestId,
+        FriendRequestStatus.accepted,
+      );
+      Get.snackbar(
+        "LINK ESTABLISHED",
+        "Friend request accepted!",
+        backgroundColor: const Color(0xFF10B981).withValues(alpha: 0.2),
+        colorText: const Color(0xFF10B981),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } catch (e) {
+      Get.snackbar("ERROR", "Failed to accept request: $e");
+    }
+  }
+
+  Future<void> declineFriendRequest(String targetUserId) async {
+    final requestId = _receivedRequestIds[targetUserId];
+    if (requestId == null) return;
+
+    try {
+      await _firestoreService.respondToFriendRequest(
+        requestId,
+        FriendRequestStatus.declined,
+      );
+    } catch (e) {
+      Get.snackbar("ERROR", "Failed to decline request: $e");
+    }
   }
 
   // --- Actions ---

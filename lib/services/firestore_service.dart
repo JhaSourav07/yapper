@@ -90,7 +90,7 @@ class FirestoreService {
           .set(request.toMap());
 
       String notificationId =
-          'friend_request_${request.senderId}_${request.receiverId}_${DateTime.now().millisecondsSinceEpoch} ';
+          'friend_request_${request.senderId}_${request.receiverId}_${DateTime.now().millisecondsSinceEpoch}';
 
       await createNotification(
         NotificationModel(
@@ -201,27 +201,30 @@ class FirestoreService {
     return _firestore
         .collection('friend_requests')
         .where('receiverId', isEqualTo: userId)
-        .where('status', isEqualTo: FriendRequestStatus.pending.name)
-        .orderBy('createdAt', descending: true)
         .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
+        .map((snapshot) {
+          final list = snapshot.docs
               .map((doc) => FriendRequestModel.fromMap(doc.data()))
-              .toList(),
-        );
+              .where((req) => req.status == FriendRequestStatus.pending && req.senderId != userId)
+              .toList();
+          list.sort((a, b) => b.sentAt.compareTo(a.sentAt));
+          return list;
+        });
   }
 
   Stream<List<FriendRequestModel>> getSentFriendRequestsStream(String userId) {
     return _firestore
         .collection('friend_requests')
         .where('senderId', isEqualTo: userId)
-        .orderBy('createdAt', descending: true)
         .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
+        .map((snapshot) {
+          final list = snapshot.docs
               .map((doc) => FriendRequestModel.fromMap(doc.data()))
-              .toList(),
-        );
+              .where((req) => req.status == FriendRequestStatus.pending && req.receiverId != userId)
+              .toList();
+          list.sort((a, b) => b.sentAt.compareTo(a.sentAt));
+          return list;
+        });
   }
 
   Future<FriendRequestModel?> getFriendRequest(
@@ -325,7 +328,7 @@ class FirestoreService {
   Stream<List<FriendshipModel>> getFriendStream(String userId) {
     return _firestore
         .collection('friendships')
-        .where('members', isEqualTo: userId)
+        .where('user1Id', isEqualTo: userId)
         .snapshots()
         .asyncMap((snapshot) async {
           QuerySnapshot snapshot2 = await _firestore
@@ -379,7 +382,7 @@ class FirestoreService {
           .collection('friendships')
           .doc(friendshipId)
           .get();
-      if (!doc.exists) {
+      if (doc.exists && doc.data() != null) {
         FriendshipModel friendship = FriendshipModel.fromMap(
           doc.data() as Map<String, dynamic>,
         );
@@ -405,7 +408,7 @@ class FirestoreService {
 
       return !doc.exists || (doc.exists && doc.data() == null);
     } catch (e) {
-      throw Exception("Failed to check if user is blocked: $e");
+      throw Exception("Failed to check if user is unfriended: $e");
     }
   }
 
@@ -456,14 +459,15 @@ class FirestoreService {
     return _firestore
         .collection('chats')
         .where('participants', arrayContains: userId)
-        .orderBy('updatedAt', descending: true)
         .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
+        .map((snapshot) {
+          final list = snapshot.docs
               .map((doc) => ChatModel.fromMap(doc.data()))
               .where((chat) => !chat.isDeletedBy(userId))
-              .toList(),
-        );
+              .toList();
+          list.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+          return list;
+        });
   }
 
   Future<void> updateChatLastMessage(
@@ -473,7 +477,7 @@ class FirestoreService {
     try {
       await _firestore.collection('chats').doc(chatId).update({
         'lastMessage': message.content,
-        'lastMessageType': message.timestamp.millisecondsSinceEpoch,
+        'lastMessageTime': message.timestamp.millisecondsSinceEpoch,
         'lastMessageSenderId': message.senderId,
         'updatedAt': DateTime.now().millisecondsSinceEpoch,
       });
@@ -533,7 +537,7 @@ class FirestoreService {
   ) async {
     try {
       await _firestore.collection('chats').doc(chatId).update({
-        'unreadCount.$userId': FieldValue.increment(increment),
+        'unreadCounts.$userId': FieldValue.increment(increment),
       });
     } catch (e) {
       throw Exception("Failed to update unread count: ${e.toString()}");
@@ -543,7 +547,7 @@ class FirestoreService {
   Future<void> restoreUnreadCount(String chatId, String userId) async {
     try {
       await _firestore.collection('chats').doc(chatId).update({
-        'unreadCount.$userId': 0,
+        'unreadCounts.$userId': 0,
       });
     } catch (e) {
       throw Exception("Failed to update unread count: ${e.toString()}");
@@ -566,19 +570,7 @@ class FirestoreService {
 
       await updateChatLastMessage(chatId, message);
       await updateUserLastSeen(chatId, message.senderId);
-
-      DocumentSnapshot chatDoc = await _firestore
-          .collection('chats')
-          .doc(chatId)
-          .get();
-
-      if (chatDoc.exists) {
-        ChatModel chat = ChatModel.fromMap(
-          chatDoc.data() as Map<String, dynamic>,
-        );
-        int currentUnread = chat.getUnreadCount(message.receiverId);
-        await updateUnreadCount(chatId, message.receiverId, currentUnread + 1);
-      }
+      await updateUnreadCount(chatId, message.receiverId, 1);
     } catch (e) {
       throw Exception("Failed to send message: ${e.toString()}");
     }
@@ -677,13 +669,14 @@ class FirestoreService {
     return _firestore
         .collection('notifications')
         .where('userId', isEqualTo: userId)
-        .orderBy('createdAt', descending: true)
         .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
+        .map((snapshot) {
+          final list = snapshot.docs
               .map((doc) => NotificationModel.fromMap(doc.data()))
-              .toList(),
-        );
+              .toList();
+          list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          return list;
+        });
   }
 
   Future<void> markNotificationAsRead(String notificationId) async {
@@ -742,8 +735,9 @@ class FirestoreService {
       for (var doc in notification.docs) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
-        if (data['data'] != null && data['data']['senderId'] == relatedUserId ||
-            data['data']['userId'] == relatedUserId) {
+        if (data['data'] != null &&
+            (data['data']['senderId'] == relatedUserId ||
+                data['data']['userId'] == relatedUserId)) {
           batch.delete(doc.reference);
         }
       }

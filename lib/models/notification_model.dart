@@ -33,7 +33,7 @@ class NotificationModel {
       'userId': userId,
       'title': title,
       'body': body,
-      'type': type.index,
+      'type': type.name,
       'data': data,
       'createdAt': createdAt.millisecondsSinceEpoch,
       'isRead': isRead,
@@ -41,15 +41,23 @@ class NotificationModel {
   }
 
   static NotificationModel fromMap(Map<String, dynamic> map) {
+    NotificationType parsedType = NotificationType.newMessage;
+    final rawType = map['type'];
+    if (rawType is int && rawType >= 0 && rawType < NotificationType.values.length) {
+      parsedType = NotificationType.values[rawType];
+    } else if (rawType is String) {
+      parsedType = NotificationType.values.firstWhere(
+        (e) => e.name == rawType,
+        orElse: () => NotificationType.newMessage,
+      );
+    }
+
     return NotificationModel(
       id: map['id'] ?? '',
       userId: map['userId'] ?? '',
       title: map['title'] ?? '',
       body: map['body'] ?? '',
-      type: NotificationType.values.firstWhere(
-        (e) => e.name == map['type'],
-        orElse: () => NotificationType.newMessage,
-      ),
+      type: parsedType,
       data: map['data'] != null
           ? Map<String, dynamic>.from(map['data'])
           : {},

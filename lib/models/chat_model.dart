@@ -40,9 +40,18 @@ class ChatModel {
       'lastSeenBy': lastSeenBy.map(
         (key, value) => MapEntry(key, value?.millisecondsSinceEpoch),
       ),
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'createdAt': createdAt.millisecondsSinceEpoch,
+      'updatedAt': updatedAt.millisecondsSinceEpoch,
     };
+  }
+
+  static DateTime _parseDateTime(dynamic value) {
+    if (value is int) {
+      return DateTime.fromMillisecondsSinceEpoch(value);
+    } else if (value is String) {
+      return DateTime.tryParse(value) ?? DateTime.now();
+    }
+    return DateTime.now();
   }
 
   static ChatModel fromMap(Map<String, dynamic> map) {
@@ -54,7 +63,7 @@ class ChatModel {
       lastSeenMap = rawLastSeen.map(
         (key, value) => MapEntry(
           key,
-          value != null ? DateTime.fromMillisecondsSinceEpoch(value) : null,
+          value != null ? _parseDateTime(value) : null,
         ),
       );
     }
@@ -67,7 +76,7 @@ class ChatModel {
       deletedAtMap = rawDeletedAt.map(
         (key, value) => MapEntry(
           key,
-          value != null ? DateTime.fromMillisecondsSinceEpoch(value) : null,
+          value != null ? _parseDateTime(value) : null,
         ),
       );
     }
@@ -77,15 +86,15 @@ class ChatModel {
       participants: List<String>.from(map['participants'] ?? []),
       lastMessage: map['lastMessage'],
       lastMessageTime: map['lastMessageTime'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['lastMessageTime'])
+          ? _parseDateTime(map['lastMessageTime'])
           : null,
       lastMessageSenderId: map['lastMessageSenderId'],
-      unreadCounts: Map<String, int>.from(map['unreadCounts'] ?? {}),
+      unreadCounts: Map<String, int>.from(map['unreadCounts'] ?? map['unreadCount'] ?? {}),
       deletedBy: Map<String, bool>.from(map['deletedBy'] ?? {}),
       deletedAt: deletedAtMap,
       lastSeenBy: lastSeenMap,
-      createdAt: DateTime.fromMicrosecondsSinceEpoch(map['createdAt']),
-      updatedAt: DateTime.fromMicrosecondsSinceEpoch(map['updatedAt']),
+      createdAt: _parseDateTime(map['createdAt']),
+      updatedAt: _parseDateTime(map['updatedAt']),
     );
   }
 

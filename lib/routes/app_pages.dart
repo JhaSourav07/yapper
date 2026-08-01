@@ -14,26 +14,24 @@ import '../views/main_screen.dart';
 import '../views/profile/change_password_screen.dart';
 import '../views/profile/profile_screen.dart';
 
+import 'package:yapper/controllers/chat_controller.dart';
+import 'package:yapper/controllers/friends_controller.dart';
+import 'package:yapper/views/chat_screen.dart';
+import 'package:yapper/views/friends_screen.dart';
+
+import 'package:yapper/controllers/notifications_controller.dart';
+import 'package:yapper/views/notifications_screen.dart';
+
 class AppPages {
   static const initial = AppRoutes.splash;
 
   static final routes = [
     GetPage(name: AppRoutes.splash, page: () => SplashScreen()),
-    // GetPage(
-    //   name: AppRoutes.home,
-    //   page: () => HomeScreen(),
-    //   binding: BindingBuilder(() {
-    //     Get.put(HomeController());
-    //   }),
-    // ),
     GetPage(name: AppRoutes.login, page: () => LoginScreen()),
     GetPage(name: AppRoutes.register, page: () => RegisterScreen()),
     GetPage(
       name: AppRoutes.forgotPassword,
       page: () => ForgotPasswordScreen(),
-      // binding: BindingBuilder(() {
-      //   Get.put(ForgotPasswordController());
-      // }),
     ),
     GetPage(
       name: AppRoutes.changePassword,
@@ -45,64 +43,37 @@ class AppPages {
     GetPage(
       name: AppRoutes.profile,
       page: () => ProfileScreen(),
-      // binding: BindingsBuilder(() {
-      //   Get.put(ProfileController());
-      // }),
     ),
-    // GetPage(
-    //   name: AppRoutes.chat,
-    //   page: () => ChatScreen(),
-    //   binding: BindingBuilder(() {
-    //     Get.put(ChatController());
-    //   }),
-    // ),
-    // GetPage(
-    //   name: AppRoutes.usersList,
-    //   page: () => UsersListScreen(),
-    //   binding: BindingBuilder(() {
-    //     Get.put(UsersListController());
-    //   }),
-    // ),
-    // GetPage(
-    //   name: AppRoutes.friends,
-    //   page: () => FriendsScreen(),
-    //   binding: BindingBuilder(() {
-    //     Get.put(FriendsController());
-    //   }),
-    // ),
-    // GetPage(
-    //   name: AppRoutes.friendRequests,
-    //   page: () => FriendRequestsScreen(),
-    //   binding: BindingBuilder(() {
-    //     Get.put(FriendRequestsController());
-    //   }),
-    // ),
-    // GetPage(
-    //   name: AppRoutes.notifications,
-    //   page: () => NotificationsScreen(),
-    //   binding: BindingBuilder(() {
-    //     Get.put(NotificationsController());
-    //   }),
-    // ),
+    GetPage(
+      name: AppRoutes.chat,
+      page: () => const ChatScreen(),
+      binding: BindingsBuilder(() {
+        Get.put(ChatController());
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.friends,
+      page: () => const FriendsScreen(),
+      binding: BindingsBuilder(() {
+        Get.put(FriendsController());
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.notifications,
+      page: () => const NotificationsScreen(),
+      binding: BindingsBuilder(() {
+        Get.put(NotificationsController());
+      }),
+    ),
     GetPage(
       name: AppRoutes.main,
-      page: () => MainScreen(),
+      page: () => const MainScreen(),
       binding: BindingsBuilder(() {
-        // Register ALL main tab controllers here
         Get.put(MainController());
         if (!Get.isRegistered<AuthController>()) {
           Get.put(AuthController(), permanent: true);
         }
-        // Get.lazyPut(() => ProfileController());     // <--- ADD THIS
-        // Get.lazyPut(() => UsersListController());   // <--- ADD THIS
       }),
     ),
-    // GetPage(
-    //   name: AppRoutes.profile,
-    //   page: () => ProfileScreen(),
-    //   binding: BindingsBuilder(() {
-    //     Get.put(ProfileController());
-    //   }),
-    // ),
   ];
 }

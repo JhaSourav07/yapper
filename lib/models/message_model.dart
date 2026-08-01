@@ -29,7 +29,7 @@ class MessageModel {
       'senderId': senderId,
       'receiverId': receiverId,
       'content': content,
-      'type': type.index,
+      'type': type.name,
       'timestamp': timestamp.millisecondsSinceEpoch,
       'isRead': isRead,
       'isEdited': isEdited,
@@ -38,15 +38,23 @@ class MessageModel {
   }
 
   static MessageModel fromMap(Map<String, dynamic> map) {
+    MessageType parsedType = MessageType.text;
+    final rawType = map['type'];
+    if (rawType is int && rawType >= 0 && rawType < MessageType.values.length) {
+      parsedType = MessageType.values[rawType];
+    } else if (rawType is String) {
+      parsedType = MessageType.values.firstWhere(
+        (e) => e.name == rawType,
+        orElse: () => MessageType.text,
+      );
+    }
+
     return MessageModel(
       id: map['id'] ?? '',
       senderId: map['senderId'] ?? '',
       receiverId: map['receiverId'] ?? '',
       content: map['content'] ?? '',
-      type: MessageType.values.firstWhere(
-        (e) => e.name == map['type'],
-        orElse: () => MessageType.text,
-      ),
+      type: parsedType,
       timestamp: DateTime.fromMillisecondsSinceEpoch(map['timestamp'] ?? 0),
       isRead: map['isRead'] ?? false,
       isEdited: map['isEdited'] ?? false,

@@ -28,21 +28,29 @@ class FriendRequestModel {
       'id': id,
       'senderId': senderId,
       'receiverId': receiverId,
-      'status': status.index,
+      'status': status.name,
       'sentAt': sentAt.millisecondsSinceEpoch,
       'respondedAt': respondedAt?.millisecondsSinceEpoch,
       'message': message,
     };
   }
   static FriendRequestModel fromMap(Map<String, dynamic> map) {
+    FriendRequestStatus parsedStatus = FriendRequestStatus.pending;
+    final rawStatus = map['status'];
+    if (rawStatus is int && rawStatus >= 0 && rawStatus < FriendRequestStatus.values.length) {
+      parsedStatus = FriendRequestStatus.values[rawStatus];
+    } else if (rawStatus is String) {
+      parsedStatus = FriendRequestStatus.values.firstWhere(
+        (e) => e.name == rawStatus,
+        orElse: () => FriendRequestStatus.pending,
+      );
+    }
+
     return FriendRequestModel(
       id: map['id'] ?? '',
       senderId: map['senderId'] ?? '',
       receiverId: map['receiverId'] ?? '',
-      status: FriendRequestStatus.values.firstWhere(
-        (e) => e.name == map['status'],
-        orElse: () => FriendRequestStatus.pending,
-      ),
+      status: parsedStatus,
       sentAt: DateTime.fromMillisecondsSinceEpoch(map['sentAt'] ?? 0),
       respondedAt: map['respondedAt'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['respondedAt'])

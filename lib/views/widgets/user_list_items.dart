@@ -148,6 +148,66 @@ class UserListItem extends StatelessWidget {
   }
 
   Widget _buildActionButton(UserRelationStatus status) {
+    if (status == UserRelationStatus.self) {
+      return const SizedBox.shrink();
+    }
+
+    if (status == UserRelationStatus.pendingReceived) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InkWell(
+            onTap: () => controller.acceptFriendRequest(user.id),
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF10B981),
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF10B981).withValues(alpha: 0.3),
+                    blurRadius: 6,
+                  )
+                ],
+              ),
+              child: const Text(
+                "ACCEPT",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          InkWell(
+            onTap: () => controller.declineFriendRequest(user.id),
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+              ),
+              child: Text(
+                "DECLINE",
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.6),
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
     String label;
     Color color;
     Color textColor;
@@ -165,25 +225,15 @@ class UserListItem extends StatelessWidget {
       
       case UserRelationStatus.pendingSent:
         label = "CANCEL";
-        color = Colors.white.withOpacity(0.1);
-        textColor = Colors.white.withOpacity(0.7);
+        color = Colors.white.withValues(alpha: 0.1);
+        textColor = Colors.white.withValues(alpha: 0.7);
         icon = Icons.close_rounded;
         onTap = () => controller.cancelFriendRequest(user.id);
-        break;
-        
-      case UserRelationStatus.pendingReceived:
-        // Technically this list usually filters out incoming requests to a specific tab,
-        // but if they appear, we can treat them as potential friends
-        label = "PENDING";
-        color = const Color(0xFFA855F7).withOpacity(0.2);
-        textColor = const Color(0xFFA855F7);
-        icon = Icons.hourglass_empty_rounded;
-        onTap = () {}; // Maybe redirect to requests tab
         break;
 
       case UserRelationStatus.blocked:
          label = "BLOCKED";
-         color = const Color(0xFFF43F5E).withOpacity(0.1);
+         color = const Color(0xFFF43F5E).withValues(alpha: 0.1);
          textColor = const Color(0xFFF43F5E);
          icon = Icons.block;
          onTap = () {};
@@ -199,32 +249,51 @@ class UserListItem extends StatelessWidget {
         break;
     }
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: color,
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        InkWell(
+          onTap: onTap,
           borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 14, color: textColor),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                color: textColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 10,
-                letterSpacing: 1,
-              ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(8),
             ),
-          ],
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: 14, color: textColor),
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 11,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
-      ),
+        if (status != UserRelationStatus.friend) ...[
+          const SizedBox(width: 6),
+          IconButton(
+            onPressed: () => controller.startChat(user),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            icon: Icon(
+              Icons.chat_bubble_outline_rounded,
+              color: const Color(0xFF22D3EE).withValues(alpha: 0.7),
+              size: 18,
+            ),
+            tooltip: "Direct Message",
+          ),
+        ],
+      ],
     );
   }
 }

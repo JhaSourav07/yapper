@@ -1,0 +1,41 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // USERS COLLECTION
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // FRIEND REQUESTS COLLECTION
+    match /friend_requests/{requestId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // FRIENDSHIPS COLLECTION
+    match /friendships/{friendshipId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // CHATS COLLECTION
+    match /chats/{chatId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // MESSAGES COLLECTION
+    match /messages/{messageId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // NOTIFICATIONS COLLECTION
+    match /notifications/{notificationId} {
+      allow read, write: if isAuthenticated();
+    }
+  }
+}

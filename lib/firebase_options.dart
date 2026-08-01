@@ -47,6 +47,7 @@ class DefaultFirebaseOptions {
     projectId: 'yapper-chat-application',
     authDomain: 'yapper-chat-application.firebaseapp.com',
     storageBucket: 'yapper-chat-application.firebasestorage.app',
+    databaseURL: 'https://yapper-chat-application-default-rtdb.asia-southeast1.firebasedatabase.app',
     measurementId: 'G-SG83WR04ZM',
   );
 
@@ -56,6 +57,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1001244906217',
     projectId: 'yapper-chat-application',
     storageBucket: 'yapper-chat-application.firebasestorage.app',
+    databaseURL: 'https://yapper-chat-application-default-rtdb.asia-southeast1.firebasedatabase.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -64,6 +66,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1001244906217',
     projectId: 'yapper-chat-application',
     storageBucket: 'yapper-chat-application.firebasestorage.app',
+    databaseURL: 'https://yapper-chat-application-default-rtdb.asia-southeast1.firebasedatabase.app',
     iosClientId: '1001244906217-p4ug395555a8fjco01iflre5djt8flom.apps.googleusercontent.com',
     iosBundleId: 'com.example.yapper',
   );
@@ -74,6 +77,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1001244906217',
     projectId: 'yapper-chat-application',
     storageBucket: 'yapper-chat-application.firebasestorage.app',
+    databaseURL: 'https://yapper-chat-application-default-rtdb.asia-southeast1.firebasedatabase.app',
     iosClientId: '1001244906217-p4ug395555a8fjco01iflre5djt8flom.apps.googleusercontent.com',
     iosBundleId: 'com.example.yapper',
   );
@@ -85,6 +89,7 @@ class DefaultFirebaseOptions {
     projectId: 'yapper-chat-application',
     authDomain: 'yapper-chat-application.firebaseapp.com',
     storageBucket: 'yapper-chat-application.firebasestorage.app',
+    databaseURL: 'https://yapper-chat-application-default-rtdb.asia-southeast1.firebasedatabase.app',
     measurementId: 'G-REP9L2QZB5',
   );
 

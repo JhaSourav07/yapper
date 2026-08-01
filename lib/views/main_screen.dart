@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'dart:math' as math;
 import 'package:yapper/controllers/main_controller.dart';
+import 'package:yapper/views/chats_list_view.dart';
 import 'package:yapper/views/find_people_screen.dart';
+import 'package:yapper/views/friends_screen.dart';
 import 'package:yapper/views/profile/profile_screen.dart';
-import '../theme/app_theme.dart';
 
 class MainScreen extends GetView<MainController> {
   const MainScreen({super.key});
@@ -27,11 +27,11 @@ class MainScreen extends GetView<MainController> {
             controller: controller.pageController,
             onPageChanged: controller.onPageChanged,
             physics: const NeverScrollableScrollPhysics(), // Controlled via BottomNav
-            children: [
-              _buildPlaceholderView("COMMUNICATIONS CORE"),
-              _buildPlaceholderView("NODE MESH / FRIENDS"),
-              const FindPeopleScreen(),
-              const ProfileScreen(),
+            children: const [
+              ChatsListView(),
+              FriendsScreen(),
+              FindPeopleScreen(),
+              ProfileScreen(),
             ],
           ),
         ],

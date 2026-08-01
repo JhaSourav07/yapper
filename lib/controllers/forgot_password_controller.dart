@@ -47,7 +47,7 @@ class ForgotPasswordController extends GetxController {
       }
 
       // 2. Execute transmission via AuthService
-      await _authService.sendPasswordResetEmail(emailController.text.trim(), email: emailController.text.trim());
+      await _authService.sendPasswordResetEmail(email: email);
       
       _emailSent.value = true;
       
